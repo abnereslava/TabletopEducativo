@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Tabuleiro Personalizado - Retro Edition</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <section id="screen-config" class="screen active">
+        <h1 class="pixel-title">CONFIGURAÇÕES DO JOGO</h1>
+        
+        <div class="config-container">
+            <div class="config-panel window-panel">
+                <h2>Desenhar Tabuleiro (Mín. 12 Casas)</h2>
+                
+                <div class="tools-container">
+                    <div class="tools-row">
+                        <button class="tool-btn active" data-type="empty">Borracha</button>
+                        <button class="tool-btn" data-type="start">Largada</button>
+                        <button class="tool-btn" data-type="end">Chegada</button>
+                        <button class="tool-btn" data-type="back3">Recue 3 Casas</button>
+                        <button class="tool-btn" data-type="forward3">Avance 3 Casas</button>
+                    </div>
+                    <div class="tools-row">
+                        <button class="tool-btn" data-type="color1">Casa Azul</button>
+                        <button class="tool-btn" data-type="color2">Casa Amarela</button>
+                        <button class="tool-btn" data-type="color3">Casa Roxa</button>
+                        <button class="tool-btn" data-type="color4">Casa Laranja</button>
+                    </div>
+                </div>
+
+                <div id="board-builder"></div>
+            </div>
+
+            <div class="config-panel window-panel">
+                <h2>Jogadores / Equipes</h2>
+                <button id="open-add-player-modal-btn" class="secondary-btn">Adicionar Novo Jogador</button>
+                <ul id="player-list-preview" class="pixel-list"></ul>
+
+                <h2>Perguntas & Timer</h2>
+                
+                <label class="dropdown-label">
+                    <span>Modo de Jogo:</span>
+                    <select id="question-mode" class="pixel-input" style="margin-bottom: 0;">
+                        <option value="auto">Exibir modal com perguntas escritas</option>
+                        <option value="manual">Fazer as perguntas verbalmente</option>
+                    </select>
+                </label>
+
+                <div class="timer-config-box">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="use-timer" checked> Ativar Timer
+                    </label>
+                    <label class="timer-label" id="timer-input-wrapper">
+                        Segundos: <input type="number" id="question-timer" value="30" min="5" class="pixel-input" style="width: 70px; margin: 0; padding: 5px;">
+                    </label>
+                </div>
+
+                <div id="questions-config" style="margin-top: 15px;">
+                    <p class="hint-text">Campos bloqueados indicam que a cor não está no tabuleiro.</p>
+                    
+                    <div class="rules-box">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="randomize-questions"> Embaralhar ordem
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="no-repeat-questions" checked> Não repetir entre equipes
+                        </label>
+                    </div>
+
+                    <div class="questions-grid">
+                        <div>
+                            <label style="color: #89b4fa; text-shadow: 2px 2px 0 #000;">CASA AZUL</label>
+                            <textarea id="q-color1" rows="3" class="pixel-input" placeholder="Perguntas Azuis..." disabled></textarea>
+                        </div>
+                        <div>
+                            <label style="color: #f9e2af; text-shadow: 2px 2px 0 #000;">CASA AMARELA</label>
+                            <textarea id="q-color2" rows="3" class="pixel-input" placeholder="Perguntas Amarelas..." disabled></textarea>
+                        </div>
+                        <div>
+                            <label style="color: #cba6f7; text-shadow: 2px 2px 0 #000;">CASA ROXA</label>
+                            <textarea id="q-color3" rows="3" class="pixel-input" placeholder="Perguntas Roxas..." disabled></textarea>
+                        </div>
+                        <div>
+                            <label style="color: #fab387; text-shadow: 2px 2px 0 #000;">CASA LARANJA</label>
+                            <textarea id="q-color4" rows="3" class="pixel-input" placeholder="Perguntas Laranjas..." disabled></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Condição de Vitória</h2>
+                <label class="radio-label">
+                    <input type="radio" name="win-condition" value="single" checked> Apenas 1 Vencedor
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="win-condition" value="multiple"> Múltiplos Vencedores
+                </label>
+
+                <button id="start-game-btn" class="primary-btn">INICIAR JOGO</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-game" class="screen">
+        <div class="game-header window-panel">
+            <button id="btn-move" class="primary-btn" style="margin:0; width: auto;">Andar Casas</button>
+            <button id="btn-skip" class="secondary-btn" style="margin:0; width: auto;">Passar a Vez</button>
+            <button id="btn-end" class="danger-btn" style="margin:0; margin-left: auto; width: auto;">FINALIZAR JOGO</button>
+        </div>
+        
+        <div class="game-layout">
+            <div id="sidebar-players" class="window-panel"></div>
+            <div id="game-board-container"></div>
+        </div>
+    </section>
+
+    <section id="screen-results" class="screen">
+        <h1 class="pixel-title" style="text-align: center;">FIM DE JOGO!</h1>
+        <div class="results-container window-panel">
+            <ul id="podium-list"></ul>
+            <button onclick="location.reload()" class="primary-btn" style="max-width: 300px; margin: 30px auto; display: block;">JOGAR NOVAMENTE</button>
+        </div>
+    </section>
+
+    <div id="modal-overlay" class="modal-overlay"></div>
+
+    <div id="add-player-modal" class="modal window-panel">
+        <h3>NOVO JOGADOR / EQUIPE</h3>
+        <input type="text" id="new-player-name" class="pixel-input" placeholder="Digite o nome..." style="margin-top: 15px;">
+        
+        <p style="text-align: left; margin-bottom: 10px;">Selecione o Token:</p>
+        <div id="avatar-selection-grid" class="avatar-grid"></div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button id="cancel-add-player-btn" class="secondary-btn" style="margin: 0;">Cancelar</button>
+            <button id="confirm-add-player-btn" class="primary-btn" style="margin: 0;">Salvar</button>
+        </div>
+    </div>
+
+    <div id="move-modal" class="modal window-panel">
+        <h3 id="move-player-name">JOGADOR DA VEZ</h3>
+        <p style="margin: 15px 0;">Quantas casas deseja andar?</p>
+        
+        <div class="move-controls">
+            <input type="number" id="move-steps" class="pixel-input" min="1" max="20" value="1" style="width: 80px; text-align: center; font-size: 1.5em; margin: 0;">
+            <button id="btn-roll-dice" class="secondary-btn" style="margin:0;">🎲 Rolar Dado</button>
+        </div>
+        <button id="confirm-move-btn" class="primary-btn">MOVER TOKEN</button>
+    </div>
+
+    <div id="question-modal" class="modal window-panel" style="max-width: 600px;">
+        <h2 id="question-timer-display" class="pixel-timer">30s</h2>
+        
+        <h3 id="question-color-title" style="text-shadow: 2px 2px 0 #000;"></h3>
+        <p id="question-text" style="font-size: 1.5em; margin: 25px 0; background: rgba(0,0,0,0.5); padding: 15px; border: 2px solid #585b70;">Texto da Pergunta aqui...</p>
+        
+        <div class="question-actions" style="margin-bottom: 15px; display: flex; gap: 15px;">
+            <button id="btn-acertou" class="primary-btn" style="background: #a6e3a1; margin:0;">ACERTOU</button>
+            <button id="btn-passar" class="secondary-btn" style="background: #f9e2af; color: #111; margin:0;">PASSAR</button>
+            <button id="btn-errou" class="danger-btn" style="margin:0;">ERROU</button>
+        </div>
+
+        <button id="btn-pause-timer" class="secondary-btn" style="margin: 0 auto; width: 50%;">⏸ Pausar Timer</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
