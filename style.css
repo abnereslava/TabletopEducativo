@@ -138,7 +138,7 @@ h1, h2, h3 { color: #fff; text-shadow: 2px 2px 0px #000; margin-bottom: 15px; }
 /* ================================================= */
 /* AVATARES E LISTAS DE JOGADORES                    */
 /* ================================================= */
-.avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 250px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.5); border: 2px solid #111; }
+.avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 400px; overflow-y: auto; padding: 10px; background: rgba(0,0,0,0.5); border: 2px solid #111; }
 .avatar-option { width: 100%; aspect-ratio: 1; cursor: pointer; border: 3px solid transparent; background: #313244; display: flex; justify-content: center; align-items: center; }
 .avatar-option img { width: 90%; height: 90%; object-fit: contain; filter: drop-shadow(2px 2px 0px #000); }
 .avatar-option:hover:not(.taken) { background: #585b70; }
@@ -164,15 +164,15 @@ h1, h2, h3 { color: #fff; text-shadow: 2px 2px 0px #000; margin-bottom: 15px; }
 /* ================================================= */
 #board-builder, #big-board {
     display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px;
-    background: #111; padding: 4px; border: 4px solid #cdd6f4; box-shadow: 8px 8px 0px rgba(0,0,0,0.6);
+    background: rgba(17, 17, 27, 0.6); backdrop-filter: blur(4px); padding: 4px; border: 4px solid #cdd6f4; box-shadow: 8px 8px 0px rgba(0,0,0,0.6);
     width: 100%; max-width: 650px; margin: 0 auto;
 }
-#big-board { max-width: 900px; margin: 0; }
+#big-board { max-width: 900px; margin: 0; transition: transform 0.5s ease-in-out; }
 
 .cell, .game-cell {
     aspect-ratio: 1 / 1; border: 2px solid rgba(0,0,0,0.5); cursor: crosshair; 
     display: flex; flex-wrap: wrap; align-content: center; justify-content: center; 
-    position: relative; background: #313244;
+    position: relative; background: rgba(49, 50, 68, 0.7);
 }
 .cell:hover { filter: brightness(1.3); }
 
@@ -187,17 +187,17 @@ h1, h2, h3 { color: #fff; text-shadow: 2px 2px 0px #000; margin-bottom: 15px; }
 [data-type="end"]    { background: #f38ba8; border-color: #111; }
 [data-type="back3"]  { background: #555555; border-color: #111; } /* Cinza escuro */
 [data-type="forward3"]{ background: #ffffff; border-color: #111; } /* Branco */
-[data-type="color1"] { background: #89b4fa; border-color: #111; } 
-[data-type="color2"] { background: #f9e2af; border-color: #111; } 
-[data-type="color3"] { background: #cba6f7; border-color: #111; } 
-[data-type="color4"] { background: #fab387; border-color: #111; } 
+[data-type="color1"] { background: #89b4fa; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0, rgba(0,0,0,0.08) 4px, transparent 4px, transparent 8px); border-color: #111; } 
+[data-type="color2"] { background: #f9e2af; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0, rgba(0,0,0,0.08) 4px, transparent 4px, transparent 8px); border-color: #111; } 
+[data-type="color3"] { background: #cba6f7; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0, rgba(0,0,0,0.08) 4px, transparent 4px, transparent 8px); border-color: #111; } 
+[data-type="color4"] { background: #fab387; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.08) 0, rgba(0,0,0,0.08) 4px, transparent 4px, transparent 8px); border-color: #111; } 
 [data-type="empty"]  { background: #181825; border: 2px dashed #45475a; }
 
 /* TELA 2 Layout */
 .game-header { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; padding: 15px 25px; }
 .game-layout { display: flex; gap: 20px; flex-wrap: nowrap; align-items: flex-start; justify-content: center; }
 #sidebar-players { width: 300px; flex-shrink: 0; }
-#game-board-container { flex: 1; display: flex; justify-content: center; min-width: 600px; }
+#game-board-container { flex: 1; display: flex; justify-content: center; align-items: center; min-width: 600px; min-height: 700px; overflow: hidden; position: relative; border-radius: 8px; }
 
 @media (max-width: 1000px) {
     .game-layout { flex-wrap: wrap; }
@@ -218,11 +218,10 @@ h1, h2, h3 { color: #fff; text-shadow: 2px 2px 0px #000; margin-bottom: 15px; }
     filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.8));
 }
 
-.hopping { animation: retroHop 0.3s steps(4) forwards; z-index: 20; }
-@keyframes retroHop {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(-25px); }
-    100% { transform: translateY(0); }
+.active-token {
+    transform: scale(1.8);
+    z-index: 50;
+    transition: transform 0.3s ease;
 }
 
 /* ================================================= */
@@ -230,6 +229,7 @@ h1, h2, h3 { color: #fff; text-shadow: 2px 2px 0px #000; margin-bottom: 15px; }
 /* ================================================= */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(17, 17, 27, 0.9); z-index: 100; }
 .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 101; width: 90%; max-width: 450px; text-align: center; }
+#add-player-modal { max-width: 700px; }
 .modal.active, .modal-overlay.active { display: block; }
 
 .move-controls { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; align-items: stretch; }

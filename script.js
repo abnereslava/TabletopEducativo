@@ -304,7 +304,7 @@ function initGameScreen() {
     updateTurnUI();
 }
 
-function updateTokensOnBoard(hoppingPlayerId = null) {
+function updateTokensOnBoard() {
     document.querySelectorAll('.avatar-token').forEach(t => t.remove());
     
     gameState.players.forEach(p => {
@@ -314,13 +314,41 @@ function updateTokensOnBoard(hoppingPlayerId = null) {
         if (cell) {
             const token = document.createElement('div');
             token.classList.add('avatar-token');
-            if (p.id === hoppingPlayerId) token.classList.add('hopping');
+            token.dataset.playerId = p.id;
+            
+            if (p.id === gameState.players[currentPlayerTurn].id) {
+                token.classList.add('active-token');
+            }
             
             token.title = p.name;
             token.innerHTML = `<img src="${p.avatar}" class="token-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzU4NWI3MCIvPjwvc3ZnPg=='">`;
             cell.appendChild(token);
         }
     });
+
+    const board = document.getElementById('big-board');
+    if (board && gameState.players.length > 0) {
+        const activePlayer = gameState.players[currentPlayerTurn];
+        const currentCoord = gameState.path[activePlayer.pathIndex];
+        if (currentCoord) {
+            const cell = document.querySelector(`.game-cell[data-x="${currentCoord.x}"][data-y="${currentCoord.y}"]`);
+            if (cell) {
+                const bw = board.offsetWidth;
+                const bh = board.offsetHeight;
+                
+                const originX = cell.offsetLeft + (cell.offsetWidth / 2);
+                const originY = cell.offsetTop + (cell.offsetHeight / 2);
+                
+                const dX = (bw / 2) - originX;
+                const dY = (bh / 2) - originY;
+                
+                const scale = 2.2;
+                
+                board.style.transformOrigin = `center center`;
+                board.style.transform = `translate(${dX * scale}px, ${dY * scale}px) scale(${scale})`;
+            }
+        }
+    }
 }
 
 function renderSidebarAndDragDrop() {
@@ -380,6 +408,7 @@ function updatePlayersOrder() {
     const newOrderIds = [...document.querySelectorAll('#sortable-players li')].map(li => parseInt(li.dataset.id));
     gameState.players = newOrderIds.map(id => gameState.players.find(p => p.id === id));
     updateTurnUI();
+    updateTokensOnBoard();
 }
 
 function updateTurnUI() {
@@ -399,6 +428,7 @@ function nextTurn() {
         currentPlayerTurn = (currentPlayerTurn + 1) % gameState.players.length;
     } while (gameState.players[currentPlayerTurn].finished && !isGameOver());
     updateTurnUI();
+    updateTokensOnBoard();
 }
 
 function isGameOver() {
@@ -455,9 +485,33 @@ async function movePlayerAnimated(player, steps, isSecondaryMove = false) {
     const stepDirection = steps > 0 ? 1 : -1;
 
     while(player.pathIndex !== targetIndex) {
+        const oldCoord = gameState.path[player.pathIndex];
+        const oldCell = document.querySelector(`.game-cell[data-x="${oldCoord.x}"][data-y="${oldCoord.y}"]`);
+
         player.pathIndex += stepDirection;
-        updateTokensOnBoard(player.id); 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        updateTokensOnBoard(); 
+        
+        const newCoord = gameState.path[player.pathIndex];
+        const newCell = document.querySelector(`.game-cell[data-x="${newCoord.x}"][data-y="${newCoord.y}"]`);
+        
+        const newToken = document.querySelector(`.avatar-token[data-player-id="${player.id}"]`);
+        if (newToken && oldCell && newCell && newToken.animate) {
+            const deltaX = oldCell.offsetLeft - newCell.offsetLeft;
+            const deltaY = oldCell.offsetTop - newCell.offsetTop;
+
+            const animation = newToken.animate([
+                { transform: `translate(${deltaX}px, ${deltaY}px) scale(1.8)` },
+                { transform: `translate(${deltaX / 2}px, ${deltaY / 2 - 40}px) scale(1.8)` },
+                { transform: `translate(0px, 0px) scale(1.8)` }
+            ], {
+                duration: 300,
+                easing: 'ease-in-out'
+            });
+
+            await animation.finished;
+        } else {
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
     }
     
     updateTurnUI();
