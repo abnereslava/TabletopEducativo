@@ -181,7 +181,7 @@ function renderAvatarGrid() {
     const usedAvatars = gameState.players.map(p => p.avatar);
 
     for (let i = 1; i <= 12; i++) {
-        const avatarPath = `avatar${i}.png`;
+        const avatarPath = `Avatar${i}.png`;
         const div = document.createElement('div');
         div.classList.add('avatar-option');
         
@@ -706,7 +706,7 @@ function showResults() {
         li.innerHTML = `
             <div class="player-info">
                 <span class="rank">${pos}º</span>
-                <img src="${p.avatar}" style="width: 50px; height: 50px; object-fit: contain; filter: drop-shadow(2px 2px 0px #000);">
+                <img src="${p.avatar}" style="width: 50px; height: 50px; object-fit: contain;">
                 <div style="display:flex; flex-direction:column;">
                     <strong style="font-size:1.5em;">${p.name}</strong> 
                     <span style="font-size: 0.8em; color: ${p.finished ? '#a6e3a1' : '#a6adc8'}">
